@@ -1,0 +1,271 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    networks:
+      - ims-network
+
+  alert-service:
+    build:
+      context: ./AlertService
+      dockerfile: Dockerfile
+    container_name: alert-service
+    ports:
+      - "8005:8005"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_SERVICE_PORT: 8005
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_RADIUS: ${ALERT_RADIUS}
+      SPRING_THRESHOLD: ${ALERT_THRESHOLD}
+      SPRING_TIME_WINDOW_MINUTES: ${ALERT_TIME_WINDOW_MINUTES}
+      SPRING_URL_INCIDENTS: ${URL_INCIDENTS}
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      incident-service:
+        condition: service_started
+    restart: on-failure
+
+  analytics-service:
+    build:
+      context: ./AnalyticsService
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    ports:
+      - "8004:8004"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_SERVICE_PORT: 8004
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_URL_INCIDENTS: ${URL_INCIDENTS}
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      incident-service:
+        condition: service_started
+    restart: on-failure
+
+  auth-service:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      SPRING_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SPRING_SERVICE_PORT: 8000
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_FRONTEND_URL: ${FRONTEND_URL}
+      SPRING_PRIVATE_KEY_JWT_PATH: ${PRIVATE_KEY_JWT}
+      SPRING_EXPIRATION_JWT: ${EXPIRATION_JWT}
+      SPRING_URL_USERS_OAUTH2: ${URL_USERS_OAUTH2}
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  config-server:
+    build:
+      context: ./ConfigServer
+      dockerfile: Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_SERVICE_PORT: 8888
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_GIT_URL: ${GIT_URL}
+      SPRING_GIT_USERNAME: ${GIT_USERNAME}
+      SPRING_GIT_PASSWORD: ${GIT_PASSWORD}
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://config-server:8888/actuator/health"]
+      interval: 10s
+      retries: 10
+      start_period: 15s
+      timeout: 5s
+
+  discovery-server:
+    build:
+      context: ./DiscoveryServer
+      dockerfile: Dockerfile
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      SPRING_SERVICE_PORT: 8761
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://discovery-server:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+
+  gateway-service:
+    build:
+      context: ./GatewayService
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8006:8006"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_SERVICE_PORT: 8006
+      SPRING_ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_FRONTEND_URL: ${FRONTEND_URL}
+      SPRING_PUBLIC_KEY_JWT_PATH: ${PUBLIC_KEY_JWT}
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+
+  incident-service:
+    build:
+      context: ./IncidentService
+      dockerfile: Dockerfile
+    container_name: incident-service
+    ports:
+      - "8002:8002"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${INCIDENT_DB_NAME}?createDatabaseIfNotExist=true&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=CET&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${INCIDENT_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${INCIDENT_DB_PASSWORD}
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_SERVICE_PORT: 8002
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      SPRING_PUBLIC_KEY_JWT_PATH: ${PUBLIC_KEY_JWT}
+      SPRING_URL_IMAGES: ${URL_IMAGES}
+      SPRING_DIR_IMAGES: ${DIR_IMAGES}
+    networks:
+      - ims-network
+    volumes:
+      - ./IncidentService/images:/opt/incidentServiceBack/images
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  moderation-service:
+    build:
+      context: ./ModerationService
+      dockerfile: Dockerfile
+    container_name: moderation-service
+    ports:
+      - "8003:8003"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MODERATION_DB_NAME}?createDatabaseIfNotExist=true&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=CET&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MODERATION_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MODERATION_DB_PASSWORD}
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_SERVICE_PORT: 8003
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      SPRING_URL_INCIDENTS: ${URL_INCIDENTS}
+      SPRING_PUBLIC_KEY_JWT_PATH: ${PUBLIC_KEY_JWT}
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  user-service:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8001:8001"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${USER_DB_NAME}?createDatabaseIfNotExist=true&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=CET&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${USER_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${USER_DB_PASSWORD}
+      SPRING_DISCOVERY_SERVER: ${DISCOVERY_SERVER}
+      SPRING_SERVICE_PORT: 8001
+      SPRING_CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      SPRING_PUBLIC_KEY_JWT_PATH: ${PUBLIC_KEY_JWT}
+    networks:
+      - ims-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+networks:
+  ims-network:
+    driver: bridge
+volumes:
+  mysql_data:

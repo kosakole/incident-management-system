@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        encrypt:
+          enabled: false
+        git:
+          uri: ${SPRING_GIT_URL}
+          search-paths:
+            - alert-service
+            - analytics-service
+            - auth-service
+            - discovery-server
+            - gateway-service
+            - incident-service
+            - moderation-service
+            - user-service
+          username: ${SPRING_GIT_USERNAME}
+          password: ${SPRING_GIT_PASSWORD}
+          force-pull: true
+          timeout: 10
+          clone-on-start: true
+        skipSslValidation: true
+server:
+  port: ${SPRING_SERVICE_PORT}
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    retryable: true
+    service-url:
+      defaultZone: ${SPRING_DISCOVERY_SERVER}

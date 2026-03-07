@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: analytics-service
+  config:
+    import: "configserver:${SPRING_CONFIG_SERVER_URL}"
