@@ -15,7 +15,7 @@ This project is a distributed system for reporting and managing public incidents
 📍 **Incident Reporting & Maps**
 
 Location Picker: Users can select incident locations manually on a map or use automatic geolocation.
-Rich Reports: Support for various incident types and subtypes, including text descriptions and image uploads.
+Rich Reports: Support for various incident types, including text descriptions and image uploads.
 Map Visualization: Anonymous users can view a public map with active incidents.
 Advanced Filtering: Filter incidents by category, location, and time (last 24h, 7 days, 31 days, or all time).
 
