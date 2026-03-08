@@ -14,7 +14,9 @@ Advanced Filtering: Filter incidents by category, location, and time (last 24h, 
 Approval Workflow: All reports are stored in a pending state and must be reviewed (approved/rejected) by a Moderator before appearing on the public map.
 RBAC (Role-Based Access Control): Specific roles for Admin, Moderator, and User, with access rights managed by user-service.
 Authentication: Exclusively implemented via Google OAuth2 (restricted to *.etf.unibl.org domain).
-📊 Analytics & Intelligent Alerts
+
+📊 **Analytics & Intelligent Alerts**
+
 Analytics Service: Provides data visualization and analysis of incidents based on time, location, and type.
 Alert Service: Detects clusters of reports (multiple incidents in a small radius within a short timeframe).
 Dynamic Thresholds: Moderators can configure alert sensitivity (radius and time window) via their profile.
