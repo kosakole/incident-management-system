@@ -125,3 +125,8 @@ Docker Push: Builds and pushes images to DockerHub.
 📝 **License**
 
 Developed as part of coursework at the **Faculty of Electrical Engineering – University of Banja Luka (ETF UNIBL)**.
+
+🔗 **Additional Repositories**
+
+Frontend GitHub link: https://github.com/kosakole/incident-management-system-frontend
+Config GitHub link: https://github.com/kosakole/config-repo
