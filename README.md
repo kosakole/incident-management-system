@@ -129,4 +129,5 @@ Developed as part of coursework at the **Faculty of Electrical Engineering – U
 🔗 **Additional Repositories**
 
 Frontend GitHub link: https://github.com/kosakole/incident-management-system-frontend
+
 Config GitHub link: https://github.com/kosakole/config-repo
