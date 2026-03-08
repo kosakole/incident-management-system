@@ -3,7 +3,7 @@ package org.unibl.etf.controllers;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.unibl.etf.models.dto.AlertSettings;
+import org.unibl.etf.configs.AlertConfig;
 import org.unibl.etf.models.dto.responses.IncidentResponse;
 import org.unibl.etf.services.AlertService;
 import reactor.core.publisher.Flux;
@@ -19,7 +19,7 @@ public class AlertController {
     }
 
     @PutMapping(value = "/settings")
-    public ResponseEntity<Void> updateSettings(@RequestBody AlertSettings newSettings) {
+    public ResponseEntity<Void> updateSettings(@RequestBody AlertConfig newSettings) {
         alertService.updateSettings(newSettings);
         return ResponseEntity.noContent().build();
     }

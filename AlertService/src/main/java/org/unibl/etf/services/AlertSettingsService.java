@@ -1,8 +1,8 @@
 package org.unibl.etf.services;
 
-import org.unibl.etf.models.dto.AlertSettings;
+import org.unibl.etf.configs.AlertConfig;
 
 public interface AlertSettingsService {
-    AlertSettings getSettings();
-    void setSettings(AlertSettings settings);
+    AlertConfig getSettings();
+    void setSettings(AlertConfig settings);
 }

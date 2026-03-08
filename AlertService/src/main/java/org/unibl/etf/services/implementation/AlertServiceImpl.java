@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.domain.geo.Metrics;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.unibl.etf.models.dto.AlertSettings;
+import org.unibl.etf.configs.AlertConfig;
 import org.unibl.etf.models.dto.responses.IncidentResponse;
 import org.unibl.etf.services.AlertListenerService;
 import org.unibl.etf.services.AlertService;
@@ -105,7 +105,7 @@ public class AlertServiceImpl implements AlertService {
 
 
     @Override
-    public void updateSettings(AlertSettings settings) {
+    public void updateSettings(AlertConfig settings) {
         alertSettingsService.setSettings(settings);
     }
 

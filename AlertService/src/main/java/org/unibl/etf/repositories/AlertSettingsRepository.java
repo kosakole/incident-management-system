@@ -1,18 +1,22 @@
 package org.unibl.etf.repositories;
 
 import org.springframework.stereotype.Repository;
-import org.unibl.etf.models.dto.AlertSettings;
+import org.unibl.etf.configs.AlertConfig;
 
 @Repository
 public class AlertSettingsRepository {
 
-    private AlertSettings settings = new AlertSettings();
+    private AlertConfig settings;
 
-    public AlertSettings getSettings() {
+    public AlertSettingsRepository(AlertConfig settings) {
+        this.settings = settings;
+    }
+
+    public AlertConfig getSettings() {
         return settings;
     }
 
-    public void setSettings(AlertSettings settings) {
+    public void setSettings(AlertConfig settings) {
         this.settings = settings;
     }
 }
