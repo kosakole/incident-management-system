@@ -12,7 +12,6 @@ jobs:
         service: [AlertService, AnalyticsService, AuthService, ConfigServer, DiscoveryServer, GatewayService, IncidentService, ModerationService, UserService] 
 
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -26,8 +25,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests -f ${{ matrix.service }}/pom.xml
 
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: set lower case service name
         id: service_name
