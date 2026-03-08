@@ -1,37 +1,30 @@
-# Incident Management System (IMS) - Microservices
+Incident Management System (IMS) - Microservices
 
-Academic project developed at the **Faculty of Electrical Engineering – University of Banja Luka (ETF UNIBL)**.
+Academic project developed at the Faculty of Electrical Engineering – University of Banja Luka (ETF UNIBL).
 
-This project was developed as part of university coursework and demonstrates the design and implementation of a distributed **microservices-based system** for reporting and managing public incidents.
+This project was developed as part of university coursework and demonstrates the design and implementation of a distributed microservices-based system for reporting and managing public incidents.
 
----
+Incident Management System (IMS) - Microservices
 
-**Incident Management System (IMS) - Microservices**
+This project is a distributed system for reporting and managing public incidents. It is built using Spring Boot microservices architecture, containerized with Docker, and automated through GitHub Actions CI pipeline.
 
-This project is a distributed system for reporting and managing public incidents. It is built using Spring Boot microservices architecture, containerized with Docker, and automated through GitHub Actions CI/CD.
-
-🚀 **Key Features**
-
-📍 **Incident Reporting & Maps**
+🚀 Key Features
+📍 Incident Reporting & Maps
 
 Location Picker: Users can select incident locations manually on a map or use automatic geolocation.
 Rich Reports: Support for various incident types, including text descriptions and image uploads.
 Map Visualization: Anonymous users can view a public map with active incidents.
 Advanced Filtering: Filter incidents by category, location, and time (last 24h, 7 days, 31 days, or all time).
 
----
-
-🛡️ **Moderation & Security**
+🛡️ Moderation & Security
 
 Approval Workflow: All reports are stored in a pending state and must be reviewed (approved/rejected) by a Moderator before appearing on the public map.
 
-RBAC (Role-Based Access Control): Specific roles for **Admin, Moderator, and User**, with access rights managed by **user-service**.
+RBAC (Role-Based Access Control): Specific roles for Admin, Moderator, and User, with access rights managed by user-service.
 
-Authentication: Exclusively implemented via **Google OAuth2** (restricted to *.etf.unibl.org domain).
+Authentication: Implemented via Google OAuth2 (restricted to *.etf.unibl.org domain).
 
----
-
-📊 **Analytics & Intelligent Alerts**
+📊 Analytics & Intelligent Alerts
 
 Analytics Service: Provides data visualization and analysis of incidents based on time, location, and type.
 
@@ -39,89 +32,96 @@ Alert Service: Detects clusters of reports (multiple incidents in a small radius
 
 Dynamic Thresholds: Moderators can configure alert sensitivity (radius and time window) via their profile.
 
----
+🏗️ System Architecture
 
-🏗️ **System Architecture**
+The system follows a modern microservices architecture.
 
-The system follows a modern microservices pattern:
+API Gateway
 
-**API Gateway**
-The single entry point for the frontend. Prevents direct communication with individual microservices for enhanced security.
+Single entry point for the frontend. Prevents direct communication with individual microservices for enhanced security.
 
-**Service Discovery (Eureka)**
+Service Discovery (Eureka)
+
 Dynamically tracks and manages service instances.
 
-**Config Server**
+Config Server
+
 Centralized configuration management for all microservices.
 
-**List of Services**
+List of Services
 
-* auth-service – Google OAuth2 Authentication
-* user-service – User roles & access management
-* gateway-service – Routing & security
-* config-server – Centralized configuration
-* discovery-server – Service registration
-* incident-service – Core incident logic & storage
-* moderation-service – Approval workflows
-* analytics-service – Reporting & data visualization
-* alert-service – Proximity detection & notifications
+auth-service – Google OAuth2 Authentication
 
----
+user-service – User roles & access management
 
-🛠️ **Tech Stack**
+gateway-service – Routing & security
 
-Backend:
+config-server – Centralized configuration
 
-* Java 17
-* Spring Boot
-* Spring Cloud
-* Spring Security
+discovery-server – Service registration
 
-Database:
+incident-service – Core incident logic & storage
 
-* MySQL
-* Redis
+moderation-service – Approval workflows
 
-DevOps:
+analytics-service – Reporting & data visualization
 
-* Docker
-* Docker Compose
-* GitHub Actions
+alert-service – Proximity detection & notifications
 
-Authentication:
+🛠️ Tech Stack
+Backend
 
-* JWT
-* Google OAuth2
+Java 17
 
----
+Spring Boot
 
-📦 **Deployment & CI/CD**
+Spring Cloud
 
-**Dockerization**
+Spring Security
+
+Database
+
+MySQL
+
+Redis
+
+DevOps
+
+Docker
+
+Docker Compose
+
+GitHub Actions
+
+Authentication
+
+JWT
+
+Google OAuth2
+
+📦 Deployment & CI
+Dockerization
 
 Every microservice contains its own Dockerfile. The entire ecosystem can be launched using:
 
-```bash
 docker-compose up -d
-```
+GitHub Actions Workflow
 
-**GitHub Actions Workflow**
+Automated CI pipeline:
 
-Automated CI/CD pipeline:
+Build: Compiles each service using Maven
 
-Build: Compiles each service using Maven.
-Docker Push: Builds and pushes images to DockerHub (lowercase naming convention).
+Docker Push: Builds and pushes Docker images to DockerHub
 
----
+🔧 Setup
 
-🔧 **Setup**
+Clone the repository
 
-1. Clone the repository.
-2. Provide necessary environment variables in `.env` (Google Client ID/Secret, DB credentials).
-3. Run `docker-compose up`.
+Provide necessary environment variables in .env (Google Client ID/Secret, DB credentials)
 
----
+Run:
 
-📝 **License**
+docker-compose up
+📝 License
 
-Developed as part of coursework at the **Faculty of Electrical Engineering – University of Banja Luka (ETF UNIBL)**.
+Developed as part of coursework at the Faculty of Electrical Engineering – University of Banja Luka (ETF UNIBL).
